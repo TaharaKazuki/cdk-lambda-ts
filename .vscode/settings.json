@@ -1,0 +1,20 @@
+{
+  "javascript.preferences.importModuleSpecifier": "non-relative",
+  "editor.formatOnSave": true,
+  "[prisma]": {
+    "editor.defaultFormatter": "Prisma.prisma"
+  },
+  "eslint.useESLintClass": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": [
+    "source.addMissingImports",
+    "source.fixAll.eslint"
+  ],
+  "editor.quickSuggestions": {
+    "strings": "on"
+  },
+  "cSpell.words": [],
+  "tailwindCSS.experimental.classRegex": [
+    ["ctl\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)"]
+  ]
+}
