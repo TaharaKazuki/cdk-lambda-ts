@@ -2,6 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
+import { LambdaDestination } from 'aws-cdk-lib/aws-s3-notifications';
 import { Construct } from 'constructs';
 import * as path from 'path';
 
@@ -28,5 +29,14 @@ export class CdkLambdaTsStack extends cdk.Stack {
       memorySize: 128,
       timeout: cdk.Duration.seconds(30),
     });
+
+    bucket.grantPut(resizeLambda);
+    bucket.grantReadWrite(resizeLambda);
+
+    bucket.addEventNotification(
+      s3.EventType.OBJECT_CREATED,
+      new LambdaDestination(resizeLambda),
+      { prefix: 'original/' }
+    );
   }
 }
