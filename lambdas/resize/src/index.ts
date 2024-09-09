@@ -2,8 +2,8 @@ import {
   S3Client,
   GetObjectCommandInput,
   GetObjectCommand,
-  PutObjectAclCommand,
   PutObjectCommandInput,
+  PutObjectCommand,
 } from '@aws-sdk/client-s3';
 import { S3Handler, S3Event } from 'aws-lambda';
 import jimp from 'jimp';
@@ -32,7 +32,6 @@ export const handler: S3Handler = async (event: S3Event) => {
     if (!result.Body) throw Error('result.Body is undefined!');
 
     const body = await result.Body.transformToByteArray();
-    console.log(body);
 
     // 2. edit
     const bodyBuffer = Buffer.from(body);
@@ -54,16 +53,16 @@ export const handler: S3Handler = async (event: S3Event) => {
     const mime = image.getMIME();
 
     const imageBuffer = await image.getBufferAsync(mime);
+    const uploadKey = `${DIRECTORY}/${parsedKey}-resize${parsedKey.ext}`;
 
-    const uploadKey = `${DIRECTORY}/${parsedKey.name}-resize${parsedKey.ext}`;
     const putInput: PutObjectCommandInput = {
       Bucket: bucketName,
       Key: uploadKey,
       Body: imageBuffer,
     };
 
-    console.info(`upload to s3://${bucketName}/${uploadKey}`);
-    const putCommand = new PutObjectAclCommand(putInput);
+    console.info(`uploading to s3://${bucketName}/${uploadKey}`);
+    const putCommand = new PutObjectCommand(putInput);
     const uploadResult = await s3Client.send(putCommand);
     console.info(uploadResult);
   }
