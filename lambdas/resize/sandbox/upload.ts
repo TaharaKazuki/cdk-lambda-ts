@@ -1,9 +1,10 @@
+import 'dotenv/config';
 import {
   PutObjectAclCommand,
   PutObjectCommandInput,
   S3Client,
 } from '@aws-sdk/client-s3';
-import Jimp from 'jimp';
+import jimp from 'jimp';
 import path from 'path';
 
 const BUCKET_NAME = process.env.BUCKET_NAME;
@@ -15,7 +16,7 @@ async function main() {
 
   console.info(`reading an image from: ${imagePath}`);
 
-  const image = await Jimp.read(imagePath);
+  const image = await jimp.read(imagePath);
   const mime = image.getMIME();
 
   const imageBuffer = await image.getBufferAsync(mime);
