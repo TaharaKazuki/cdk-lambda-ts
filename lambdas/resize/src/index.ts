@@ -53,7 +53,7 @@ export const handler: S3Handler = async (event: S3Event) => {
     const mime = image.getMIME();
 
     const imageBuffer = await image.getBufferAsync(mime);
-    const uploadKey = `${DIRECTORY}/${parsedKey}-resize${parsedKey.ext}`;
+    const uploadKey = `${DIRECTORY}/${parsedKey.name}-resize${parsedKey.ext}`;
 
     const putInput: PutObjectCommandInput = {
       Bucket: bucketName,
