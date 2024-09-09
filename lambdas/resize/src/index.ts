@@ -2,9 +2,14 @@ import {
   S3Client,
   GetObjectCommandInput,
   GetObjectCommand,
+  PutObjectAclCommand,
+  PutObjectCommandInput,
 } from '@aws-sdk/client-s3';
 import { S3Handler, S3Event } from 'aws-lambda';
 import jimp from 'jimp';
+import path from 'path';
+
+const DIRECTORY = 'resize';
 
 export const handler: S3Handler = async (event: S3Event) => {
   const s3Client = new S3Client();
@@ -13,6 +18,7 @@ export const handler: S3Handler = async (event: S3Event) => {
     // 1.download
     const bucketName = record.s3.bucket.name;
     const key = record.s3.object.key;
+    const parsedKey = path.parse(key);
 
     const input: GetObjectCommandInput = {
       Bucket: bucketName,
@@ -43,5 +49,22 @@ export const handler: S3Handler = async (event: S3Event) => {
     console.info(`resized size: (${resizedWidth}, ${resizedHeight})`);
 
     image.resize(resizedWidth, resizedHeight);
+
+    // 3. upload
+    const mime = image.getMIME();
+
+    const imageBuffer = await image.getBufferAsync(mime);
+
+    const uploadKey = `${DIRECTORY}/${parsedKey.name}-resize${parsedKey.ext}`;
+    const putInput: PutObjectCommandInput = {
+      Bucket: bucketName,
+      Key: uploadKey,
+      Body: imageBuffer,
+    };
+
+    console.info(`upload to s3://${bucketName}/${uploadKey}`);
+    const putCommand = new PutObjectAclCommand(putInput);
+    const uploadResult = await s3Client.send(putCommand);
+    console.info(uploadResult);
   }
 };
